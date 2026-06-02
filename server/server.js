@@ -21,7 +21,7 @@ const io = new Server(httpServer, {
 cors: {
     origin: [
       "http://localhost:5173", // 로컬 테스트용
-      "https://your-app-name.vercel.app" // 👈 [여기에 내 진짜 Vercel 프론트엔드 주소 넣기!]
+      "https://kakako-sv9k.onrender.com" // 👈 [여기에 내 진짜 Vercel 프론트엔드 주소 넣기!]
     ],
     methods: ["GET", "POST"],
     credentials: true
