@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
-import { socket } from '../../server/socket'
+// import { socket } from '../../server/socket'
 import { useNavigate } from "react-router-dom"
+import { socket } from "./server/socket"
 
 interface User{
   id: number
