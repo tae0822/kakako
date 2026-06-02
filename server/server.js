@@ -10,6 +10,8 @@ import bcrypt from 'bcrypt'
 
 dotenv.config()
 
+console.log("현재 접속하는 DB 주소:", process.env.DATABASE_URL);
+
 const { PrismaClient } = pkg;
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
 const prisma = new PrismaClient({ adapter })

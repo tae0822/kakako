@@ -1,6 +1,12 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 
+
+    const API_URL = import.meta.env.MODE === "production"
+    ? "https://kakako-sv9k.onrender.com" // 배포된 서버 주소
+    : "http://localhost:3000";            // 내 컴퓨터 로컬 주소
+
+
 function Login({setToken, setUsername, setUserId}: 
     {setToken: React.Dispatch<React.SetStateAction<string | null>>,
     setUsername: React.Dispatch<React.SetStateAction<string | null>>,
@@ -14,7 +20,7 @@ function Login({setToken, setUsername, setUserId}:
     const handleLogin = async(e: React.FormEvent)=>{
         e.preventDefault();
 
-        const res = await fetch("http://localhost:3000/login",{
+        const res = await fetch(`${API_URL}/login`,{
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({email, password})
