@@ -113,12 +113,11 @@ io.on("connection", async (socket) => {
         user: true // 새로 저장된 메시지에도 작성자 정보 포함해서 반환받기!
       }
     })
-
     io.emit("receive_message", newMessage)
 
-}catch(error){
-        console.error("Error saving message to database:", error)
-    }
+    }catch(error){
+            console.error("Error saving message to database:", error)
+        }
 
   })
 
