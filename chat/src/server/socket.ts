@@ -11,5 +11,4 @@ export const socket = io(BACKEND_URL, {
   auth: {
     token: localStorage.getItem("token") // 👈 로그인 토큰도 배포 환경에 맞춰 같이 넘어가도록 복구!
   },
-  transports: ["websocket"]
 })
