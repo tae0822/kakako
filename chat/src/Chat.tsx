@@ -37,14 +37,16 @@ function Chat({userId} : {userId: number | null}) {
 
   useEffect(() => {
     const token = localStorage.getItem("token")
+    const storedUserId = localStorage.getItem("userId")
+    const username = localStorage.getItem("username")
     // const storedUserId = localStorage.getItem("userId")
     
     // 💡 [핵심 수정] 부모가 준 userId가 아직 null이더라도, 
     // 로컬스토리지에 직접 확인해 보니 userId가 존재한다면 쫓아내지 않고 기다려줍니다!
-    const hasUserId = userId || localStorage.getItem("userId")
+    // const hasUserId = userId || localStorage.getItem("userId")
 
     // 🔐 로그인 상태가 아니면 튕겨내기
-    if (!token || !hasUserId) {
+    if (!token || !storedUserId) {
       alert("로그인이 필요합니다. 로그인 페이지로 이동합니다.")
       navigate('/login')
       return
@@ -55,7 +57,6 @@ function Chat({userId} : {userId: number | null}) {
     // 🔌 소켓 연결
     socket.connect()
 
-    const username = localStorage.getItem("username")
     socket.emit("user_join", username) // 소켓 연결 시 서버에 유저 이름도 함께 알리기
 
     socket.on("online_users", (users: string[])=>{
@@ -83,7 +84,7 @@ function Chat({userId} : {userId: number | null}) {
       socket.disconnect()
 
     }
-  }, [navigate, userId])
+  }, [navigate, userId, localStorage.getItem("token"), localStorage.getItem("userId")])
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault() // form 제출 시 페이지 새로고침 방지
