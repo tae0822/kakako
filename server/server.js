@@ -93,8 +93,6 @@ io.on("connection", async (socket) => {
     // 에러가 나면 프론트엔드에 빈 배열이라도 던져줘서 프론트가 뻗는 걸 방지합니다.
     socket.emit("previous_messages", [])
   }
-
-  socket.emit("previous_messages", previousMessages)
   
   socket.on("user_join", (username) => {
     onlineUsers.set(socket.id, username)
