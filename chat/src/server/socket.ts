@@ -1,14 +1,3 @@
-// import { io } from "socket.io-client"
-
-// const token = localStorage.getItem("token"); // 저장된 JWT 토큰
-
-// export const socket = io("http://localhost:3000",{
-//     auth:{
-//         token: token // 서버로 연결할 때 JWT 토큰을 함께 보냅니다.
-//     }
-// })
-
-
 import { io } from "socket.io-client"
 
 // 🌐 현재 환경이 배포(production)인지 개발(development)인지 컴퓨터가 알아서 판단합니다.

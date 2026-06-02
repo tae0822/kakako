@@ -52,7 +52,6 @@ function Chat({userId} : {userId: number | null}) {
 
     socket.auth = { token }
 
-
     // 🔌 소켓 연결
     socket.connect()
 
