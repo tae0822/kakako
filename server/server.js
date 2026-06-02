@@ -81,12 +81,18 @@ const onlineUsers = new Map()  // socketId → username
 io.on("connection", async (socket) => {
   console.log("user connected")
 
-  const previousMessages = await prisma.message.findMany({
-    orderBy: { createdAt : "asc"},
-    include:{
-      user: true // 메시지와 함께 작성자 정보도 가져오기 위해 include 옵션 사용!
+  try {
+      const previousMessages = await prisma.message.findMany({
+        orderBy: { createdAt : "asc"},
+        include:{
+          user: true 
+        }
+      })
+      socket.emit("previous_messages", previousMessages)
+    } catch (error) {
+      // 🚨 에러가 나면 서버를 끄지 말고, 왜 에러가 났는지 로그만 남기라고 명령합니다.
+      console.error("❌ [Prisma 에러 원인 카치]:", error)
     }
-  })
 
   socket.emit("previous_messages", previousMessages)
   
