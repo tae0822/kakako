@@ -81,18 +81,21 @@ const onlineUsers = new Map()  // socketId → username
 io.on("connection", async (socket) => {
   console.log("user connected")
 
-  try {
-      const previousMessages = await prisma.message.findMany({
-        orderBy: { createdAt : "asc"},
-        include:{
-          user: true 
-        }
-      })
-      socket.emit("previous_messages", previousMessages)
-    } catch (error) {
-      // 🚨 에러가 나면 서버를 끄지 말고, 왜 에러가 났는지 로그만 남기라고 명령합니다.
-      console.error("❌ [Prisma 에러 원인 카치]:", error)
-    }
+ try {
+    const previousMessages = await prisma.message.findMany({
+      orderBy: { createdAt : "asc"},
+      include:{
+        user: true 
+      }
+    })
+    // 데이터베이스 조회가 성공했을 때만 프론트엔드로 안전하게 보냅니다.
+    socket.emit("previous_messages", previousMessages)
+  } catch (error) {
+    // 🚨 DB 연결 실패 시 Render 로그에 원인을 이쁘게 찍고 서버는 계속 살려둡니다.
+    console.error("❌ [Prisma DB 조회 실패! Render의 Environment 탭에 DATABASE_URL을 확인하세요]:", error.message)
+    // 에러가 나면 프론트엔드에 빈 배열이라도 던져줘서 프론트가 뻗는 걸 방지합니다.
+    socket.emit("previous_messages", [])
+  }
 
   socket.emit("previous_messages", previousMessages)
   
