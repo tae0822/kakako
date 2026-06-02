@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "npx prisma generate",
-    "start": "npx ts-node server.ts",
+    "start": "node server.js",
     "dev": "nodemon server.ts"
   },
   "keywords": [],
