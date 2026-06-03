@@ -50,7 +50,7 @@ function Chat({userId} : {userId: number | null}) {
   useEffect(() => {
     // const token = localStorage.getItem("token")
     // const storedUserId = localStorage.getItem("userId")
-    const username = localStorage.getItem("username")
+    // const username = localStorage.getItem("username")
     // const storedUserId = localStorage.getItem("userId")
     
     // 💡 [핵심 수정] 부모가 준 userId가 아직 null이더라도, 
