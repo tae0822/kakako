@@ -8,7 +8,9 @@ import { useState } from "react"
 function App() {
   const [token, setToken] = useState(localStorage.getItem("token"))
   const [userName, setUsername ] = useState(localStorage.getItem("username"))
-  const [userId, setUserId] = useState<number | null>(null)
+  const [userId, setUserId] = useState<number | null>(
+    localStorage.getItem("userId") ? Number(localStorage.getItem("userId")) : null
+  )
 
   return (
     <BrowserRouter>
