@@ -131,6 +131,13 @@ function Chat({userId} : {userId: number | null}) {
           const currentUserId = userId || Number(localStorage.getItem("userId"));
           const isMine = msg.userId === currentUserId;
 
+          if (msg.id === messages[0]?.id) { // 첫 번째 메시지만 딱 한 번만 찍도록
+          console.log("현재 userId 상태:", userId);
+          console.log("localStorage userId:", localStorage.getItem("userId"));
+          console.log("비교 대상(msg.userId):", msg.userId);
+          console.log("결과(isMine):", isMine);
+        }
+
           return (
             <div 
               key={msg.id || msg.createdAt} 
