@@ -57,7 +57,12 @@ function Chat({userId} : {userId: number | null}) {
     // 🔌 소켓 연결
     socket.connect()
 
-    socket.emit("user_join", username) // 소켓 연결 시 서버에 유저 이름도 함께 알리기
+    // socket.emit("user_join", username) // 소켓 연결 시 서버에 유저 이름도 함께 알리기
+
+    socket.on("connect", () => {
+      console.log("소켓 연결 성공! 서버에 유저 이름 알림");
+      socket.emit("user_join", username);
+    });
 
     socket.on("online_users", (users: string[])=>{
       setOnlineUsers(users)
@@ -78,6 +83,7 @@ function Chat({userId} : {userId: number | null}) {
 
 
     return () => {
+      socket.off("connect")
       socket.off("online_users")
       socket.off("previous_messages")
       socket.off("receive_message")
