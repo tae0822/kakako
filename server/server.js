@@ -80,6 +80,13 @@ const onlineUsers = new Map()  // socketId → username
 io.on("connection", async (socket) => {
   console.log("user connected")
 
+const user = await prisma.user.findUnique({ where: { id: socket.userId } });
+
+if (user) {
+    onlineUsers.set(socket.id, user.username);
+    io.emit("online_users", Array.from(onlineUsers.values()));
+  }
+
  try {
     const previousMessages = await prisma.message.findMany({
       orderBy: { createdAt : "asc"},
@@ -96,10 +103,10 @@ io.on("connection", async (socket) => {
     socket.emit("previous_messages", [])
   }
   
-  socket.on("user_join", (username) => {
-    onlineUsers.set(socket.id, username)
-    io.emit("online_users", Array.from(onlineUsers.values()))
-  })
+  // socket.on("user_join", (username) => {
+  //   onlineUsers.set(socket.id, username)
+  //   io.emit("online_users", Array.from(onlineUsers.values()))
+  // }) 위에서 JWT 검증 후 소켓 객체에 userId를 심었으니, 이제는 DB에서 username을 조회해서 온라인 유저 목록을 관리합니다.
 
 
   socket.on("send_message", async (data) => {

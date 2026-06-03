@@ -19,7 +19,7 @@ function Navbar({token, userName, setToken, setUsername}: {token: string | null,
   return (
     <nav className="flex justify-between items-center h-16 px-6 bg-white border-b border-gray-200">
         {/* 로고 영역 */}
-        <Link to="/login" className="text-xl font-bold tracking-tight text-gray-950">
+        <Link to="/" className="text-xl font-bold tracking-tight text-gray-950">
             Kokoa
         </Link>
         

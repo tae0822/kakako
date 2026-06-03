@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 // import { socket } from '../../server/socket'
-import { useNavigate } from "react-router-dom"
+// import { useNavigate } from "react-router-dom"
 import { socket } from "./server/socket"
 
 interface User{
@@ -23,7 +23,7 @@ function Chat({userId} : {userId: number | null}) {
   const [onlineUsers, setOnlineUsers] = useState<string[]>([])
 
   // 🎨 화면 UI 구별용 (F12로 조작해도 내 화면만 바뀔 뿐 서버는 안전!)
-  const navigate = useNavigate()
+  // const navigate = useNavigate()
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -73,7 +73,7 @@ function Chat({userId} : {userId: number | null}) {
 
     socket.on("connect", () => {
       console.log("소켓 연결 성공! 서버에 유저 이름 알림");
-      socket.emit("user_join", username);
+      // socket.emit("user_join", username);
     });
 
     socket.on("online_users", (users: string[])=>{
