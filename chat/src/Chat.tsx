@@ -36,8 +36,20 @@ function Chat({userId} : {userId: number | null}) {
   },[messages])
 
   useEffect(() => {
-    const token = localStorage.getItem("token")
-    const storedUserId = localStorage.getItem("userId")
+  const token = localStorage.getItem("token");
+  if (!token) return;
+
+  socket.auth = { token };
+  socket.connect();
+
+  return () => {
+    socket.disconnect(); // 컴포넌트 언마운트 시에만 연결 해제
+  };
+}, []); // 👈 의존성 비우기 (마운트 시 딱 한 번만!)
+
+  useEffect(() => {
+    // const token = localStorage.getItem("token")
+    // const storedUserId = localStorage.getItem("userId")
     const username = localStorage.getItem("username")
     // const storedUserId = localStorage.getItem("userId")
     
@@ -46,16 +58,16 @@ function Chat({userId} : {userId: number | null}) {
     // const hasUserId = userId || localStorage.getItem("userId")
 
     // 🔐 로그인 상태가 아니면 튕겨내기
-    if (!token || !storedUserId) {
-      alert("로그인이 필요합니다. 로그인 페이지로 이동합니다.")
-      navigate('/login')
-      return
-    }
+    // if (!token || !storedUserId) {
+    //   alert("로그인이 필요합니다. 로그인 페이지로 이동합니다.")
+    //   navigate('/login')
+    //   return
+    // }
 
-    socket.auth = { token }
+    // socket.auth = { token }
 
     // 🔌 소켓 연결
-    socket.connect()
+    // socket.connect()
 
     // socket.emit("user_join", username) // 소켓 연결 시 서버에 유저 이름도 함께 알리기
 
@@ -90,7 +102,7 @@ function Chat({userId} : {userId: number | null}) {
       socket.disconnect()
 
     }
-  }, [navigate, userId, localStorage.getItem("token"), localStorage.getItem("userId")])
+  }, [])
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault() // form 제출 시 페이지 새로고침 방지
@@ -115,7 +127,10 @@ function Chat({userId} : {userId: number | null}) {
       <div className="message-box" style={{ height: "400px", overflowY: "auto", border: "1px solid #ccc", padding: "10px", marginBottom: "15px", borderRadius: "8px" }}>
         {messages.map((msg) => {
           // 내가 보낸 메시지인지 여부 판별
-          const isMine = msg.userId === userId
+          // const isMine = msg.userId === userId
+          const currentUserId = userId || Number(localStorage.getItem("userId"));
+          const isMine = msg.userId === currentUserId;
+
           return (
             <div 
               key={msg.id || msg.createdAt} 
