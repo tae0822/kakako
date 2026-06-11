@@ -128,11 +128,17 @@ exports.Prisma.UserScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.RoomScalarFieldEnum = {
+  id: 'id',
+  name: 'name'
+};
+
 exports.Prisma.MessageScalarFieldEnum = {
   id: 'id',
   text: 'text',
   userId: 'userId',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  roomId: 'roomId'
 };
 
 exports.Prisma.SortOrder = {
@@ -148,6 +154,7 @@ exports.Prisma.QueryMode = {
 
 exports.Prisma.ModelName = {
   User: 'User',
+  Room: 'Room',
   Message: 'Message'
 };
 

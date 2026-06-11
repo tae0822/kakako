@@ -1,15 +1,13 @@
 import { useEffect, useRef, useState } from "react"
-// import { socket } from '../../server/socket'
-// import { useNavigate } from "react-router-dom"
 import { socket } from "./server/socket"
 
-interface User{
+interface User {
   id: number
   username: string
   email: string
 }
 
-interface Message{
+interface Message {
   id: number
   text: string
   userId: number
@@ -17,82 +15,47 @@ interface Message{
   user: User
 }
 
-function Chat({userId} : {userId: number | null}) {
+function Chat({ userId, roomId }: { userId: number | null; roomId: number }) {
   const [message, setMessage] = useState<string>("")
   const [messages, setMessages] = useState<Message[]>([])
   const [onlineUsers, setOnlineUsers] = useState<string[]>([])
 
-  // 🎨 화면 UI 구별용 (F12로 조작해도 내 화면만 바뀔 뿐 서버는 안전!)
-  // const navigate = useNavigate()
-
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  const scrollToBottom = ()=>{
+  const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     scrollToBottom()
-  },[messages])
+  }, [messages])
 
   useEffect(() => {
-  const token = localStorage.getItem("token");
-  if (!token) return;
+    const token = localStorage.getItem("token")
+    if (!token) return
 
-  socket.auth = { token };
-  socket.connect();
+    socket.auth = { token }
+    socket.connect()
 
-  return () => {
-    socket.disconnect(); // 컴포넌트 언마운트 시에만 연결 해제
-  };
-}, []); // 👈 의존성 비우기 (마운트 시 딱 한 번만!)
+    return () => {}
+  }, [])
 
   useEffect(() => {
-    // const token = localStorage.getItem("token")
-    // const storedUserId = localStorage.getItem("userId")
-    // const username = localStorage.getItem("username")
-    // const storedUserId = localStorage.getItem("userId")
-    
-    // 💡 [핵심 수정] 부모가 준 userId가 아직 null이더라도, 
-    // 로컬스토리지에 직접 확인해 보니 userId가 존재한다면 쫓아내지 않고 기다려줍니다!
-    // const hasUserId = userId || localStorage.getItem("userId")
-
-    // 🔐 로그인 상태가 아니면 튕겨내기
-    // if (!token || !storedUserId) {
-    //   alert("로그인이 필요합니다. 로그인 페이지로 이동합니다.")
-    //   navigate('/login')
-    //   return
-    // }
-
-    // socket.auth = { token }
-
-    // 🔌 소켓 연결
-    // socket.connect()
-
-    // socket.emit("user_join", username) // 소켓 연결 시 서버에 유저 이름도 함께 알리기
-
     socket.on("connect", () => {
-      console.log("소켓 연결 성공! 서버에 유저 이름 알림");
-      // socket.emit("user_join", username);
-    });
+      console.log("소켓 연결 성공! 서버에 유저 이름 알림")
+    })
 
-    socket.on("online_users", (users: string[])=>{
+    socket.on("online_users", (users: string[]) => {
       setOnlineUsers(users)
     })
 
-    socket.on("previous_messages", (data: any)=>{
-      console.log("previous_messages 받음:", data)  // 👈 추가
+    socket.on("previous_messages", (data: Message[]) => {
       setMessages(data)
     })
 
-    socket.on("receive_message", (data: any) => {
-      console.log("receive_message 받음:", data)  // 👈 추가
+    socket.on("receive_message", (data: Message) => {
       setMessages((prev) => [...prev, data])
     })
-
-    //  // 👈 이벤트 등록 후 서버에 다시 요청
-    // socket.emit("get_previous_messages")
-
 
     return () => {
       socket.off("connect")
@@ -100,104 +63,115 @@ function Chat({userId} : {userId: number | null}) {
       socket.off("previous_messages")
       socket.off("receive_message")
       socket.disconnect()
-
     }
   }, [])
 
-  const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault() // form 제출 시 페이지 새로고침 방지
+  useEffect(() => {
+    if (!socket.connected) return
+    socket.emit("join_room", roomId)
+    socket.emit("get_previous_messages", roomId)
+    setMessages([])
+  }, [roomId])
 
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault()
     if (!message.trim()) return
 
     socket.emit("send_message", {
       text: message,
-      // userId: Number(localStorage.getItem("userId")) // socket으로 대체. 👈 나중에 로그인 기능이 생기면 이 부분도 동적으로 바꿔주기!
+      roomId: roomId,
     })
 
     setMessage("")
   }
 
+  const formatTime = (isoString: string) => {
+    const date = new Date(isoString)
+    return date.toLocaleTimeString("ko-KR", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    })
+  }
+
+  const currentUserId = userId || Number(localStorage.getItem("userId"))
+
   return (
-    <div className="flex">
-   <div className="chat-container" style={{ maxWidth: "600px", margin: "0 auto", padding: "20px" }}>
-      <h2> 실시간 채팅방</h2>
-      <hr />
-      
-      {/* 💬 메시지 창 기록 영역 */}
-      <div className="message-box" style={{ height: "400px", overflowY: "auto", border: "1px solid #ccc", padding: "10px", marginBottom: "15px", borderRadius: "8px" }}>
-        {messages.map((msg) => {
-          // 내가 보낸 메시지인지 여부 판별
-          // const isMine = msg.userId === userId
-          const currentUserId = userId || Number(localStorage.getItem("userId"));
-          const isMine = msg.userId === currentUserId;
+    <div className="flex justify-center w-full px-4 py-6">
+      <div className="w-full max-w-2xl text-left">
+        <h2 className="text-center text-gray-900 dark:text-gray-100">{roomId}번 방</h2>
 
-          if (msg.id === messages[0]?.id) { // 첫 번째 메시지만 딱 한 번만 찍도록
-          console.log("현재 userId 상태:", userId);
-          console.log("localStorage userId:", localStorage.getItem("userId"));
-          console.log("비교 대상(msg.userId):", msg.userId);
-          console.log("결과(isMine):", isMine);
-        }
-
-          return (
-            <div 
-              key={msg.id || msg.createdAt} 
-              className={isMine ? "message my-message" : "message other-message"}
-              style={{
-                textAlign: isMine ? "right" : "left",
-                margin: "10px 0"
-              }}
-            >
-              {/* 상대방이 보낸 메시지일 때만 이름 표시 */}
-              {!isMine && (
-                <small style={{ display: "block", color: "#666", fontWeight: "bold" }}>
-                  {msg.user.username}
-                </small>
-              )}
-              
-              {/* 말풍선 */}
-              <span style={{
-                display: "inline-block",
-                padding: "8px 12px",
-                borderRadius: "12px",
-                backgroundColor: isMine ? "#DCF8C6" : "#EAEAEA", // 내 글은 연두색, 남의 글은 회색
-                color: "#000",
-                maxWidth: "70%",
-                wordBreak: "break-word"
-              }}>
-                {msg.text}
-              </span>
-            </div>
-          )
-        })}
-        {/* 5. ⭐여기가 핵심! 메시지 목록 바로 밑에 빈 디브를 두고 가리킵니다. */}
-        <div ref={messagesEndRef} />
-      </div>
-   
-      {/* ✍️ 메시지 입력 영역 */}
-      <form onSubmit={handleSendMessage} style={{ display: "flex", gap: "10px" }}>
-        <input
-          type="text"
-          placeholder="메시지를 입력하세요..."
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          style={{ flex: 1, padding: "10px", borderRadius: "4px", border: "1px solid #ccc" }}
-        />
-        <button type="submit" style={{ padding: "10px 20px", backgroundColor: "#007BFF", color: "#fff", border: "none", borderRadius: "4px", cursor: "pointer" }}>
-          전송
-        </button>
-      </form>
-    </div>
-
-    <div className="w-40 border-l p-4">
-      <p className="text-sm font-medium mb-2">온라인 {onlineUsers.length}명</p>
-      {onlineUsers.map((user, i) => (
-        <div key={i} className="flex items-center gap-2 text-sm py-1">
-          <div className="w-2 h-2 bg-green-400 rounded-full" />
-          {user}
+        <div className="mt-4 mb-4 p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+          <p className="text-xs font-medium text-gray-400 dark:text-gray-500 mb-2">
+            온라인 {onlineUsers.length}명
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {onlineUsers.length === 0 ? (
+              <span className="text-xs text-gray-400 dark:text-gray-500">접속 중인 사용자가 없습니다</span>
+            ) : (
+              onlineUsers.map((user) => (
+                <span
+                  key={user}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200"
+                >
+                  <span className="w-1.5 h-1.5 bg-green-400 rounded-full shrink-0" />
+                  {user}
+                </span>
+              ))
+            )}
+          </div>
         </div>
-      ))}
-    </div>
 
+        <div className="h-[400px] overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-xl p-4 mb-4 bg-white dark:bg-gray-800">
+          {messages.map((msg) => {
+            const isMine = msg.userId === currentUserId
+
+            return (
+              <div
+                key={msg.id || msg.createdAt}
+                className={`my-2.5 ${isMine ? "text-right" : "text-left"}`}
+              >
+                {!isMine && (
+                  <small className="block text-gray-500 dark:text-gray-400 font-semibold text-xs mb-0.5">
+                    {msg.user.username}
+                  </small>
+                )}
+
+                <span
+                  className={[
+                    "inline-block px-3 py-2 rounded-xl max-w-[70%] break-words text-sm",
+                    isMine
+                      ? "bg-emerald-100 dark:bg-emerald-900/40 text-gray-900 dark:text-gray-100"
+                      : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100",
+                  ].join(" ")}
+                >
+                  {msg.text}
+                </span>
+                <div className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">
+                  {formatTime(msg.createdAt)}
+                </div>
+              </div>
+            )
+          })}
+          <div ref={messagesEndRef} />
+        </div>
+
+        <form onSubmit={handleSendMessage} className="flex gap-2">
+          <input
+            type="text"
+            placeholder="메시지를 입력하세요..."
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            className="flex-1 h-10 px-3 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:border-gray-400 dark:focus:border-gray-500"
+          />
+          <button
+            type="submit"
+            className="h-10 px-5 text-sm font-medium bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-lg hover:bg-gray-700 dark:hover:bg-gray-300 transition-colors cursor-pointer"
+          >
+            전송
+          </button>
+        </form>
+      </div>
     </div>
   )
 }

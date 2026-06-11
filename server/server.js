@@ -16,6 +16,19 @@ const { PrismaClient } = pkg;
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
 const prisma = new PrismaClient({ adapter })
 
+async function seedRooms() {
+  for (let i = 1; i <= 5; i++) {
+    await prisma.room.upsert({
+      where: { id: i },
+      update: {},
+      create: { id: i, name: `${i}번 방` },
+    });
+  }
+  console.log("방 데이터 준비 완료!");
+}
+
+seedRooms();
+
 const app = express()
 const httpServer = createServer(app)
 
@@ -86,9 +99,15 @@ if (user) {
     onlineUsers.set(socket.id, user.username);
     io.emit("online_users", Array.from(onlineUsers.values()));
   }
+  
+  socket.on("join_room", async (roomId)=>{
+    socket.join(String(roomId));
+    console.log(`User with ID ${socket.userId} joined room ${roomId}`);
+
 
  try {
     const previousMessages = await prisma.message.findMany({
+      where: { roomId: Number(roomId) },
       orderBy: { createdAt : "asc"},
       include:{
         user: true 
@@ -102,6 +121,8 @@ if (user) {
     // 에러가 나면 프론트엔드에 빈 배열이라도 던져줘서 프론트가 뻗는 걸 방지합니다.
     socket.emit("previous_messages", [])
   }
+  })
+
   
   // socket.on("user_join", (username) => {
   //   onlineUsers.set(socket.id, username)
@@ -116,18 +137,18 @@ if (user) {
       data: {
         text: data.text,
         // userId: data.userId // 아까 배운 관계 설정 고리!
-        userId: socket.userId // 소켓 연결 시 검증된 유저 ID를 사용해서 메시지 저장하기!
+        userId: socket.userId, // 소켓 연결 시 검증된 유저 ID를 사용해서 메시지 저장하기!
+        roomId: data.roomId 
       },
       include:{
         user: true // 새로 저장된 메시지에도 작성자 정보 포함해서 반환받기!
       }
     })
-    io.emit("receive_message", newMessage)
+    io.to(String(data.roomId)).emit("receive_message", newMessage) // 방 번호 별로 전송
 
     }catch(error){
             console.error("Error saving message to database:", error)
         }
-
   })
 
   socket.on("disconnect", () => {

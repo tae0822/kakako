@@ -21,10 +21,18 @@ model User {
   createdAt DateTime  @default(now())
 }
 
+model Room {
+  id      Int     @id @default(autoincrement())
+  name    String
+  messages Message[]
+}
+
 model Message {
   id        Int      @id @default(autoincrement())
   text      String
   userId    Int
   user      User     @relation(fields:[userId], references: [id])
   createdAt DateTime @default(now())
+  roomId    Int
+  room      Room     @relation(fields: [roomId], references: [id])
 }

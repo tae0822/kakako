@@ -8,9 +8,7 @@ function Register() {
     const [error, setError] = useState("")
     const navigate = useNavigate()
 
-    const API_URL = import.meta.env.MODE === "production"
-    ? "https://kakako-sv9k.onrender.com" // 배포된 서버 주소
-    : "http://localhost:3000";            // 내 컴퓨터 로컬 주소
+    const API_URL = import.meta.env.VITE_BACKEND_URL ?? "http://localhost:3000"
 
     const handleRegister = async(e: React.FormEvent<HTMLFormElement>)=>{
         e.preventDefault();
@@ -40,62 +38,62 @@ function Register() {
     
 
   return (
-  <div className="min-h-screen flex items-center justify-center bg-gray-50">
-            <div className="w-80 bg-white border border-gray-200 rounded-xl p-8">
-                <h2 className="text-lg font-medium mb-1">회원가입</h2>
-                <p className="text-sm text-gray-400 mb-6">새로운 계정을 생성하세요</p>
+  <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+            <div className="w-80 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
+                <h2 className="text-lg font-medium mb-1 text-gray-900 dark:text-gray-100">회원가입</h2>
+                <p className="text-sm text-gray-400 dark:text-gray-500 mb-6">새로운 계정을 생성하세요</p>
 
                 {error && (
-                    <div className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2 mb-4">
+                    <div className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/50 rounded-lg px-3 py-2 mb-4">
                         {error}
                     </div>
                 )}
 
                 <form onSubmit={handleRegister} className="flex flex-col gap-4">
                     <div className="flex flex-col gap-1.5">
-                        <label className="text-xs text-gray-500">사용자 이름</label>
+                        <label className="text-xs text-gray-500 dark:text-gray-400">사용자 이름</label>
                         <input
                             type="text"
                             placeholder="username"
                             onChange={(e) => setUsername(e.target.value)}
-                            className="h-10 px-3 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-gray-400"
+                            className="h-10 px-3 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-gray-400 dark:focus:border-gray-500"
                             required
                         />
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                        <label className="text-xs text-gray-500">이메일</label>
+                        <label className="text-xs text-gray-500 dark:text-gray-400">이메일</label>
                         <input
                             type="email"
                             placeholder="example@email.com"
                             onChange={(e) => setEmail(e.target.value)}
-                            className="h-10 px-3 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-gray-400"
+                            className="h-10 px-3 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-gray-400 dark:focus:border-gray-500"
                             required
                         />
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                        <label className="text-xs text-gray-500">비밀번호</label>
+                        <label className="text-xs text-gray-500 dark:text-gray-400">비밀번호</label>
                         <input
                             type="password"
                             placeholder="비밀번호를 입력하세요"
                             onChange={(e) => setPassword(e.target.value)}
-                            className="h-10 px-3 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-gray-400"
+                            className="h-10 px-3 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-gray-400 dark:focus:border-gray-500"
                             required
                         />
                     </div>
 
                     <button
                         type="submit"
-                        className="h-10 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-700 mt-1"
+                        className="h-10 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-lg hover:bg-gray-700 dark:hover:bg-gray-300 mt-1"
                     >
                         가입하기
                     </button>
                 </form>
 
-                <div className="text-center text-xs text-gray-400 mt-4">
+                <div className="text-center text-xs text-gray-400 dark:text-gray-500 mt-4">
                     이미 계정이 있으신가요?{" "}
-                    <a href="/login" className="text-blue-500">로그인</a>
+                    <a href="/login" className="text-blue-500 dark:text-blue-400">로그인</a>
                 </div>
             </div>
         </div>
