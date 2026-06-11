@@ -158,7 +158,30 @@ if (user) {
   })
 })
 
-const PORT = process.env.PORT || 3000;
-httpServer.listen(PORT, () => {
-  console.log("server running")
-})
+async function startServer() {
+  try {
+    console.log("Running migrations...");
+    // 1. 마이그레이션 먼저 실행
+    await new Promise((resolve, reject) => {
+      const { exec } = require('child_process');
+      exec('npx prisma migrate deploy --schema=./prisma/schema.prisma', (err, stdout, stderr) => {
+        if (err) reject(err);
+        else resolve(stdout);
+      });
+    });
+
+    // 2. Room 데이터 준비
+    await seedRooms();
+
+    // 3. 서버 실행
+    const PORT = process.env.PORT || 3000;
+    httpServer.listen(PORT, '0.0.0.0', () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("서버 시작 실패:", error);
+    process.exit(1); // 에러 발생 시 프로세스 종료
+  }
+}
+
+startServer();
