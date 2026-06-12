@@ -41,7 +41,16 @@ cors: {
   }
 })
 
-app.use(cors())
+app.use(cors({
+  origin: ["https://kakako-git-main-jopd456-1172s-projects.vercel.app", "http://localhost:3000"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
+// Preflight 요청(OPTIONS)을 확실하게 처리하기 위한 설정
+app.options('*', cors());
+
 app.use(express.json())
 
 app.post("/register", async(req, res)=>{
