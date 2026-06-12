@@ -48,8 +48,6 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-// Preflight 요청(OPTIONS)을 확실하게 처리하기 위한 설정
-app.options('*', cors());
 
 app.use(express.json())
 
