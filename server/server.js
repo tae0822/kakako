@@ -172,15 +172,19 @@ async function startServer() {
   async function seedRooms() {
     console.log("방 데이터 확인 중...");
     for (let i = 1; i <= 5; i++) {
-      try {
-        await prisma.room.upsert({
-          where: { id: i },
-          update: {}, // 이미 있으면 수정하지 않음
-          create: { id: i, name: `${i}번 방` }, // 없으면 생성
+      // 1. 먼저 해당 ID가 있는지 확인
+      const exists = await prisma.room.findUnique({
+        where: { id: i }
+      });
+  
+      // 2. 없으면 생성
+      if (!exists) {
+        await prisma.room.create({
+          data: { id: i, name: `${i}번 방` }
         });
-      } catch (error) {
-        // 이미 생성되어 발생하는 에러는 무시
-        continue;
+        console.log(`${i}번 방 생성 완료`);
+      } else {
+        console.log(`${i}번 방 이미 존재함, 건너뜀`);
       }
     }
     console.log("방 데이터 준비 완료!");
