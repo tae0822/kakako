@@ -42,7 +42,11 @@ cors: {
 })
 
 app.use(cors({
-  origin: ["https://kakako-git-main-jopd456-1172s-projects.vercel.app", "http://localhost:3000"],
+  origin: [
+    "https:kakako.vercel.app",
+    "https://kakako-git-main-jopd456-1172s-projects.vercel.app", 
+    "http://localhost:3000"
+  ],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"]
