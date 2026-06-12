@@ -169,7 +169,24 @@ async function startServer() {
   }
   
   // 2. Room 데이터 준비
-  seedRooms();
+  async function seedRooms() {
+    console.log("방 데이터 확인 중...");
+    for (let i = 1; i <= 5; i++) {
+      try {
+        await prisma.room.upsert({
+          where: { id: i },
+          update: {}, // 이미 있으면 수정하지 않음
+          create: { id: i, name: `${i}번 방` }, // 없으면 생성
+        });
+      } catch (error) {
+        // 이미 생성되어 발생하는 에러는 무시
+        continue;
+      }
+    }
+    console.log("방 데이터 준비 완료!");
+  }
+
+  await seedRooms();
   
   // 3. 서버 실행
   const PORT = process.env.PORT || 3000;
