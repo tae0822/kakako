@@ -42,11 +42,7 @@ cors: {
 })
 
 app.use(cors({
-  origin: [
-    "https:kakako.vercel.app",
-    "https://kakako-git-main-jopd456-1172s-projects.vercel.app", 
-    "http://localhost:3000"
-  ],
+  origin: ["*"],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"]
@@ -56,6 +52,7 @@ app.use(cors({
 app.use(express.json())
 
 app.post("/register", async(req, res)=>{
+  console.log("회원가입 요청 도착!");
   const {username , email, password} = req.body;
   const hashedPassword = await bcrypt.hash(password, 10); // 비밀번호 해싱
 
